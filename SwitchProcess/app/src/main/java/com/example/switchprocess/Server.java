@@ -52,6 +52,7 @@ public class Server {
                         @Override
                         public void run() {
                             activity.txvProcessMessage.setText(message);
+                            //TODO:mainActivityのwindowリストにwindowをパースしてリスト化
                             System.out.println(message);
                         }
                     });
