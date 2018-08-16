@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity{
     private RecyclerView rvwWindowList;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity{
             if(rowData_.getTitle().equals(_windowTitle)){
                 it.remove();
                 windowRecycleViewAdapter.notifyItemRemoved(index_);
+                windowRecycleViewAdapter.notifyItemRangeChanged(index_, windowList.size());
                 break;
             }
         }
