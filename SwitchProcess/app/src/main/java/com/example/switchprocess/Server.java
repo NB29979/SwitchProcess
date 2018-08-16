@@ -8,13 +8,14 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collections;
 
 public class Server {
-    MainActivity activity;
-    ServerSocket serverSocket;
-    String message = "";
-    static final int socketServerPORT = 10080;
+    private MainActivity activity;
+    private ServerSocket serverSocket;
+    private String message = "";
+    private static final int socketServerPORT = 10080;
 
     public Server(MainActivity _activity){
         this.activity = _activity;
@@ -51,9 +52,7 @@ public class Server {
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            activity.txvProcessMessage.setText(message);
-                            //TODO:mainActivityのwindowリストにwindowをパースしてリスト化
-                            System.out.println(message);
+                            activity.setLsvWindowList(Parse(message));
                         }
                     });
                 }
@@ -61,6 +60,13 @@ public class Server {
             catch(IOException e){
                 e.printStackTrace();
             }
+        }
+        private ArrayList<String> Parse(String _str){
+            ArrayList<String> windowRowList = new ArrayList<>();
+            for(String title : _str.split(",")){
+                windowRowList.add(title);
+            }
+            return windowRowList;
         }
     }
 }
