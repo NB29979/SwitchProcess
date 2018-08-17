@@ -10,5 +10,13 @@ public class WindowViewHolder extends RecyclerView.ViewHolder{
     public WindowViewHolder(View _view){
         super(_view);
         titleView = _view.findViewById(R.id.txv_title);
+
+        itemView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View _v){
+                System.out.println("Clicked");
+                // クライアント建設予定地
+            }
+        });
     }
 }
