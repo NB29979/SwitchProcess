@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class SelectWindowAsyncLoader extends AsyncTaskLoader<String>{
+    private String result;
+    private boolean isStarted = false;
     private String ipAddress;
     private String sendMessage;
 
@@ -33,7 +35,7 @@ public class SelectWindowAsyncLoader extends AsyncTaskLoader<String>{
                 }
                 sender_.close();
 
-                return "Selected windowTitle was sent";
+                return "Selected windowTitle was sent to " + ipAddress;
             }
             catch (UnknownHostException uhe){
                 return uhe.getMessage();
@@ -46,12 +48,22 @@ public class SelectWindowAsyncLoader extends AsyncTaskLoader<String>{
     }
     @Override
     protected void onStartLoading(){
-        super.onStartLoading();
-        forceLoad();
+        if(result != null){
+            deliverResult(result);
+            return;
+        }
+        if(!isStarted || takeContentChanged()){
+            forceLoad();
+        }
     }
     @Override
-    protected void onStopLoading(){
-        super.onStopLoading();
-        cancelLoad();
+    protected void onForceLoad(){
+        super.onForceLoad();
+        isStarted = true;
+    }
+    @Override
+    public void deliverResult(String _result){
+        this.result = _result;
+        super.deliverResult(_result);
     }
 }

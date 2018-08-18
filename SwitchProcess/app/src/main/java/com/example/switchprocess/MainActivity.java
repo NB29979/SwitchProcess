@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import android.app.LoaderManager;
+import android.content.Loader;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,6 +19,7 @@ public class MainActivity extends AppCompatActivity{
     private WindowRecycleViewAdapter windowRecycleViewAdapter;
 
     private Server server;
+    private String remoteIPAddress;
     private ArrayList<WindowRowData> windowList;
 
     @Override
@@ -35,7 +38,12 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View view) {
                         final int pos_ = holder_.getAdapterPosition();
-                        System.out.println("hoge_"+pos_);
+                        System.out.println(windowList.get(pos_).getTitle());
+                        Bundle bundle_ = new Bundle();
+                        bundle_.putString("ipAddress", remoteIPAddress);
+                        bundle_.putString("sendMessage", windowList.get(pos_).getTitle());
+
+                        getLoaderManager().restartLoader(1, bundle_, callbacks);
                     }
                 });
                 return holder_;
@@ -54,6 +62,24 @@ public class MainActivity extends AppCompatActivity{
         server.onDestroy();
     }
 
+    private final LoaderManager.LoaderCallbacks<String> callbacks = new LoaderManager.LoaderCallbacks<String>() {
+        @Override
+        public Loader<String>onCreateLoader(int _i, Bundle _bundle){
+            return new SelectWindowAsyncLoader(getApplicationContext(),
+                    _bundle.getString("ipAddress"), _bundle.getString("sendMessage"));
+        }
+        @Override
+        public void onLoadFinished(Loader<String> _loader, String _status){
+            getSupportLoaderManager().destroyLoader(_loader.getId());
+            System.out.println(_status);
+        }
+        @Override
+        public void onLoaderReset(Loader<String> _loader){}
+    };
+
+    public void setRemoteIPAddress(String _ipAddress){
+        remoteIPAddress = _ipAddress.split(":")[0].substring(1);
+    }
     public void setLsvWindowList(ArrayList<String> _newWindowList){
         ArrayList<String> titles = new ArrayList<>();
         for(WindowRowData w : windowList) titles.add(w.getTitle());

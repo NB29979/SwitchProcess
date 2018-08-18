@@ -9,6 +9,7 @@ import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class Server {
@@ -41,10 +42,9 @@ public class Server {
                 serverSocket = new ServerSocket(socketServerPORT);
 
                 while(true){
-                    for(NetworkInterface n: Collections.list(NetworkInterface.getNetworkInterfaces())){ for(InetAddress addr : Collections.list(n.getInetAddresses())){ if(addr instanceof Inet4Address && !addr.isLoopbackAddress()) { System.out.println( addr.getHostAddress() ); } } }
-
                     System.out.println("Waiting...");
-                    Socket socket_ = serverSocket.accept();
+                    final Socket socket_ = serverSocket.accept();
+                    activity.setRemoteIPAddress(socket_.getRemoteSocketAddress().toString());
 
                     BufferedReader br_ = new BufferedReader(new InputStreamReader(socket_.getInputStream()));
                     message = br_.readLine();
@@ -53,6 +53,7 @@ public class Server {
                         @Override
                         public void run() {
                             activity.setLsvWindowList(Parse(message));
+                            System.out.println("WindowList has been changed");
                         }
                     });
                 }
@@ -62,11 +63,7 @@ public class Server {
             }
         }
         private ArrayList<String> Parse(String _str){
-            ArrayList<String> windowRowList = new ArrayList<>();
-            for(String title : _str.split(",")){
-                windowRowList.add(title);
-            }
-            return windowRowList;
+            return new ArrayList<>(Arrays.asList(_str.split(",")));
         }
     }
 }
