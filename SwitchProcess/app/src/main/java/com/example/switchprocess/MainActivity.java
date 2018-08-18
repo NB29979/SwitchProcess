@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -25,7 +27,20 @@ public class MainActivity extends AppCompatActivity{
 
         rvwWindowList = findViewById(R.id.rvw_windowRecyclerView);
 
-        windowRecycleViewAdapter = new WindowRecycleViewAdapter(windowList);
+        windowRecycleViewAdapter = new WindowRecycleViewAdapter(windowList){
+            @Override
+            public WindowViewHolder onCreateViewHolder(ViewGroup _parent, int _viewType) {
+                final WindowViewHolder holder_ = super.onCreateViewHolder(_parent, _viewType);
+                holder_.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final int pos_ = holder_.getAdapterPosition();
+                        System.out.println("hoge_"+pos_);
+                    }
+                });
+                return holder_;
+            }
+        };
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvwWindowList.setLayoutManager(llm);
         rvwWindowList.setAdapter(windowRecycleViewAdapter);
