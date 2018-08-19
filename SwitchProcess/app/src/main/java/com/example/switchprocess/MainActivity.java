@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -25,6 +26,9 @@ public class MainActivity extends AppCompatActivity{
     private String remoteIPAddress;
     private ArrayList<WindowRowData> windowList;
 
+    private boolean isRClickDOWN;
+    private boolean isLClickDOWN;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +37,9 @@ public class MainActivity extends AppCompatActivity{
 
         rvwWindowList = findViewById(R.id.rvw_windowRecyclerView);
         civCursorRect = findViewById(R.id.civ_cursorRect);
+
+        isRClickDOWN = false;
+        isLClickDOWN = false;
 
         // ウインドウタイトルを選択した場合
         windowRecycleViewAdapter = new WindowRecycleViewAdapter(windowList){
@@ -43,7 +50,7 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View view) {
                         final int pos_ = holder_.getAdapterPosition();
-                        Send(new SendData("SelectTitle", windowList.get(pos_).getTitle(),0,0), 1);
+                        Send(new SendData("SelectTitle", windowList.get(pos_).getTitle()), 1);
                     }
                 });
                 return holder_;
@@ -55,6 +62,7 @@ public class MainActivity extends AppCompatActivity{
         rvwWindowList.setAdapter(windowRecycleViewAdapter);
         civCursorRect.SetActivity(this);
 
+
         Toast.makeText(this, "listening", Toast.LENGTH_SHORT).show();
         server = new Server(this);
     }
@@ -62,6 +70,37 @@ public class MainActivity extends AppCompatActivity{
     protected void onDestroy(){
         super.onDestroy();
         server.onDestroy();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent _keyevent) {
+        switch (_keyevent.getKeyCode()) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (_keyevent.getAction() == KeyEvent.ACTION_DOWN) {
+                    if(!isRClickDOWN) {
+                        Send(new SendData("MouseEvent", "LClickDOWN"), 2);
+                        isRClickDOWN = true;
+                    }
+                }
+                else{
+                    isRClickDOWN = false;
+                    Send(new SendData("MouseEvent", "LClickUP"), 2);
+                }
+                break;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (_keyevent.getAction() == KeyEvent.ACTION_DOWN) {
+                    if(!isLClickDOWN) {
+                        Send(new SendData("MouseEvent", "RClickDOWN"), 2);
+                        isLClickDOWN = true;
+                    }
+                }
+                else{
+                    isLClickDOWN = false;
+                    Send(new SendData("MouseEvent", "RClickUP"), 2);
+                }
+                break;
+        }
+        return true;
     }
 
     private final LoaderManager.LoaderCallbacks<String> callbacks = new LoaderManager.LoaderCallbacks<String>() {

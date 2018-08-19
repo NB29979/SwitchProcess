@@ -39,7 +39,7 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
     private GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener(){
         @Override
         public boolean onSingleTapUp(MotionEvent _event){
-            mainActivity.Send(new SendData("MouseEvent", "SingleTap", 0, 0), 2);
+            mainActivity.Send(new SendData("MouseEvent", "SingleTap"), 2);
             return false;
         }
         @Override
@@ -52,10 +52,13 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
             pos_ to_ = new pos_(_eventTo.getX(), _eventTo.getY());
             float diffX_ = to_.x-from_.x;
             float diffY_ = to_.y-from_.y;
+            float absX_ = Math.abs(diffX_);
+            float absY_ = Math.abs(diffY_);
 
-            if((Math.abs(diffX_) + Math.abs(diffY_)) < 50)return false;
+            if((absX_+absY_) < 50)return false;
             else{
-                mainActivity.Send(new SendData("MouseEvent","", Math.atan2((double)diffY_, (double)diffX_), maxPointerCount), 2);
+                mainActivity.Send(new SendData("MouseEvent","MoveCursor",
+                        (double)absX_, (double)absY_,Math.atan2((double)diffY_, (double)diffX_), maxPointerCount), 2);
             }
             return false;
         }
