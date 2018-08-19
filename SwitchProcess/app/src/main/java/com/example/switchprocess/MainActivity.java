@@ -18,10 +18,8 @@ import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity{
     private RecyclerView rvwWindowList;
-    private CursorImageView imvCursorRect;
 
     private WindowRecycleViewAdapter windowRecycleViewAdapter;
-    private GestureDetector gestureDetector;
 
     private Server server;
     private String remoteIPAddress;
@@ -34,7 +32,6 @@ public class MainActivity extends AppCompatActivity{
         windowList = new ArrayList<>();
 
         rvwWindowList = findViewById(R.id.rvw_windowRecyclerView);
-        imvCursorRect = findViewById(R.id.imv_cursorRect);
 
         // ウインドウタイトルを選択した場合
         windowRecycleViewAdapter = new WindowRecycleViewAdapter(windowList){
