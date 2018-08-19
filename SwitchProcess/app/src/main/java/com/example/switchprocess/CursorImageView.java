@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 public class CursorImageView extends android.support.v7.widget.AppCompatImageView{
     private GestureDetector gestureDetector;
     private MainActivity mainActivity;
+    private int maxPointerCount;
 
     public CursorImageView(Context _context){
         this(_context, null);
@@ -22,7 +23,12 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
 
     @Override
     public boolean onTouchEvent(MotionEvent _event){
+        if(_event.getAction() == MotionEvent.ACTION_DOWN ||
+                _event.getAction() == MotionEvent.ACTION_POINTER_DOWN){
+            maxPointerCount = 0;
+        }
         gestureDetector.onTouchEvent(_event);
+        maxPointerCount = Math.max(_event.getPointerCount(), maxPointerCount);
         return true;
     }
 
@@ -31,6 +37,11 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
     }
 
     private GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener(){
+        @Override
+        public boolean onSingleTapUp(MotionEvent _event){
+            mainActivity.Send(new SendData("MouseEvent", "SingleTap", 0, 0), 2);
+            return false;
+        }
         @Override
         public boolean onFling(MotionEvent _eventFrom, MotionEvent _eventTo, float _vX, float _vY) {
             class pos_{
@@ -44,10 +55,8 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
 
             if((Math.abs(diffX_) + Math.abs(diffY_)) < 50)return false;
             else{
-                mainActivity.Send(new SendData("MouseEvent","", Math.atan2((double)diffY_, (double)diffX_),0), 2);
+                mainActivity.Send(new SendData("MouseEvent","", Math.atan2((double)diffY_, (double)diffX_), maxPointerCount), 2);
             }
-
-            System.out.println("fling");
             return false;
         }
     };
