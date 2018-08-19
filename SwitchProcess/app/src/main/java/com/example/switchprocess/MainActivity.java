@@ -10,6 +10,8 @@ import android.widget.Toast;
 import android.app.LoaderManager;
 import android.content.Loader;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity{
 
         rvwWindowList = findViewById(R.id.rvw_windowRecyclerView);
 
+        // ウインドウタイトルを選択した場合
         windowRecycleViewAdapter = new WindowRecycleViewAdapter(windowList){
             @Override
             public WindowViewHolder onCreateViewHolder(ViewGroup _parent, int _viewType) {
@@ -41,7 +44,10 @@ public class MainActivity extends AppCompatActivity{
                         System.out.println(windowList.get(pos_).getTitle());
                         Bundle bundle_ = new Bundle();
                         bundle_.putString("ipAddress", remoteIPAddress);
-                        bundle_.putString("sendMessage", windowList.get(pos_).getTitle());
+                        bundle_.putString("sendMessage",
+                                new Gson().toJson(new SendData("SelectTitle",
+                                        windowList.get(pos_).getTitle()))
+                        );
 
                         getLoaderManager().restartLoader(1, bundle_, callbacks);
                     }
