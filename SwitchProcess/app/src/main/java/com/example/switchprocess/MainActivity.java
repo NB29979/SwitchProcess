@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.GestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -17,8 +18,10 @@ import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity{
     private RecyclerView rvwWindowList;
+    private CursorImageView imvCursorRect;
 
     private WindowRecycleViewAdapter windowRecycleViewAdapter;
+    private GestureDetector gestureDetector;
 
     private Server server;
     private String remoteIPAddress;
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity{
         windowList = new ArrayList<>();
 
         rvwWindowList = findViewById(R.id.rvw_windowRecyclerView);
+        imvCursorRect = findViewById(R.id.imv_cursorRect);
 
         // ウインドウタイトルを選択した場合
         windowRecycleViewAdapter = new WindowRecycleViewAdapter(windowList){
@@ -55,6 +59,7 @@ public class MainActivity extends AppCompatActivity{
                 return holder_;
             }
         };
+
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvwWindowList.setLayoutManager(llm);
         rvwWindowList.setAdapter(windowRecycleViewAdapter);
