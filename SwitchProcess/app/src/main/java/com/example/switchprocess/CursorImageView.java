@@ -44,8 +44,7 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
 
             if((Math.abs(diffX_) + Math.abs(diffY_)) < 50)return false;
             else{
-                mainActivity.Send("MouseEvent",
-                        Double.toString(Math.atan2((double)diffY_, (double)diffX_)), 2);
+                mainActivity.Send(new SendData("MouseEvent","", Math.atan2((double)diffY_, (double)diffX_),0), 2);
             }
 
             System.out.println("fling");

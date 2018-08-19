@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View view) {
                         final int pos_ = holder_.getAdapterPosition();
-                        Send("SelectTitle", windowList.get(pos_).getTitle(), 1);
+                        Send(new SendData("SelectTitle", windowList.get(pos_).getTitle(),0,0), 1);
                     }
                 });
                 return holder_;
@@ -117,8 +117,8 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     }
-    public void Send(String _sendDataType, String _sendMessage, int _loaderID){
-        String data = new Gson().toJson(new SendData(_sendDataType, _sendMessage));
+    public void Send(SendData _sendData, int _loaderID){
+        String data = new Gson().toJson(_sendData);
 
         Bundle bundle_ = new Bundle();
         bundle_.putString("ipAddress", remoteIPAddress);
