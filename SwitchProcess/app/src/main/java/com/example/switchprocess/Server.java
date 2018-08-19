@@ -1,5 +1,7 @@
 package com.example.switchprocess;
 
+import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -52,7 +54,7 @@ public class Server {
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            activity.setLsvWindowList(Parse(message));
+                            activity.setLsvWindowList(new Gson().fromJson(message, new ArrayList<String>().getClass()));
                             System.out.println("WindowList has been changed");
                         }
                     });
