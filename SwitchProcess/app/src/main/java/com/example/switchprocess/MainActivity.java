@@ -4,7 +4,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -18,6 +17,7 @@ import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity{
     private RecyclerView rvwWindowList;
+    private CursorImageView civCursorRect;
 
     private WindowRecycleViewAdapter windowRecycleViewAdapter;
 
@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity{
         windowList = new ArrayList<>();
 
         rvwWindowList = findViewById(R.id.rvw_windowRecyclerView);
+        civCursorRect = findViewById(R.id.civ_cursorRect);
 
         // ウインドウタイトルを選択した場合
         windowRecycleViewAdapter = new WindowRecycleViewAdapter(windowList){
@@ -42,15 +43,7 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View view) {
                         final int pos_ = holder_.getAdapterPosition();
-                        System.out.println(windowList.get(pos_).getTitle());
-                        Bundle bundle_ = new Bundle();
-                        bundle_.putString("ipAddress", remoteIPAddress);
-                        bundle_.putString("sendMessage",
-                                new Gson().toJson(new SendData("SelectTitle",
-                                        windowList.get(pos_).getTitle()))
-                        );
-
-                        getLoaderManager().restartLoader(1, bundle_, callbacks);
+                        Send("SelectTitle", windowList.get(pos_).getTitle(), 1);
                     }
                 });
                 return holder_;
@@ -60,6 +53,7 @@ public class MainActivity extends AppCompatActivity{
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvwWindowList.setLayoutManager(llm);
         rvwWindowList.setAdapter(windowRecycleViewAdapter);
+        civCursorRect.SetActivity(this);
 
         Toast.makeText(this, "listening", Toast.LENGTH_SHORT).show();
         server = new Server(this);
@@ -122,5 +116,14 @@ public class MainActivity extends AppCompatActivity{
                 break;
             }
         }
+    }
+    public void Send(String _sendDataType, String _sendMessage, int _loaderID){
+        String data = new Gson().toJson(new SendData(_sendDataType, _sendMessage));
+
+        Bundle bundle_ = new Bundle();
+        bundle_.putString("ipAddress", remoteIPAddress);
+        bundle_.putString("sendMessage", data);
+
+        getLoaderManager().restartLoader(_loaderID, bundle_, callbacks);
     }
 }

@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.example.switchprocess.CursorImageView
-        android:id="@+id/imv_cursorRect"
+        android:id="@+id/civ_cursorRect"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_weight="3"

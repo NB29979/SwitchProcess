@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 
 public class CursorImageView extends android.support.v7.widget.AppCompatImageView{
     private GestureDetector gestureDetector;
+    private MainActivity mainActivity;
 
     public CursorImageView(Context _context){
         this(_context, null);
@@ -25,6 +26,10 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
         return true;
     }
 
+    public void SetActivity(MainActivity _mainActivity){
+        mainActivity = _mainActivity;
+    }
+
     private GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener(){
         @Override
         public boolean onFling(MotionEvent _eventFrom, MotionEvent _eventTo, float _vX, float _vY) {
@@ -39,8 +44,8 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
 
             if((Math.abs(diffX_) + Math.abs(diffY_)) < 50)return false;
             else{
-                System.out.println(
-                Math.atan2((double)diffY_, (double)diffX_));
+                mainActivity.Send("MouseEvent",
+                        Double.toString(Math.atan2((double)diffY_, (double)diffX_)), 2);
             }
 
             System.out.println("fling");
