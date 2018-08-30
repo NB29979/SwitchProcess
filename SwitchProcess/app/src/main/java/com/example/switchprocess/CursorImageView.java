@@ -35,10 +35,22 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
         }
         maxPointerCount = Math.max(_event.getPointerCount(), maxPointerCount);
 
-        pos variation = new pos(currentPos.x-oldPos.x, currentPos.y-oldPos.y);
+        pos variation = new pos(currentPos.x - oldPos.x, currentPos.y - oldPos.y);
 
-        mainActivity.Send(new SendingData("MouseEvent","MoveCursor",
-                (double)variation.x, (double)variation.y, maxPointerCount));
+        switch (maxPointerCount){
+            case 1:
+                mainActivity.Send(new SendingData("MouseEvent", "MoveCursor",
+                        (double) variation.x, (double) variation.y, maxPointerCount));
+                break;
+            case 2:
+                mainActivity.Send(new SendingData("MouseEvent", "ScrollWindow",
+                        (double) variation.x, (double) variation.y, maxPointerCount));
+                break;
+            case 3:
+                mainActivity.Send(new SendingData("MouseEvent", "HScrollWindow",
+                        (double) variation.x, (double) variation.y, maxPointerCount));
+                break;
+        }
 
         oldPos.setPos(currentPos.x, currentPos.y);
 

@@ -90,8 +90,6 @@ public class MainActivity extends AppCompatActivity{
         rvwWindowList.setAdapter(windowRecycleViewAdapter);
         civCursorRect.SetActivity(this);
 
-        Toast.makeText(this, "listening", Toast.LENGTH_SHORT).show();
-
         try{
             sendDataWebSocket = new SendDataWebSocket(new URI());
             sendDataWebSocket.connect();
