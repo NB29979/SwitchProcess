@@ -16,6 +16,13 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.java_websocket.WebSocketImpl;
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class MainActivity extends AppCompatActivity{
     private RecyclerView rvwWindowList;
     private CursorImageView civCursorRect;
@@ -28,6 +35,24 @@ public class MainActivity extends AppCompatActivity{
 
     private boolean isRClickDOWN;
     private boolean isLClickDOWN;
+
+    private SendDataWebSocket sendDataWebSocket;
+
+    private class SendDataWebSocket extends WebSocketClient {
+        public SendDataWebSocket(URI _uri){
+            super(_uri);
+        }
+        @Override
+        public void onOpen(ServerHandshake _handShake){ System.out.println("Connected"); }
+        @Override
+        public void onMessage(final String _message){}
+        @Override
+        public void onClose(int _code, String _reason, boolean _remote){ System.out.println("Disconnected"); }
+        @Override
+        public void onError(Exception e){
+            System.out.println(e);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +75,7 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View view) {
                         final int pos_ = holder_.getAdapterPosition();
-                        Send(new SendData("SelectTitle", windowList.get(pos_).getTitle()), 1);
+                        Send(new SendData("SelectTitle", windowList.get(pos_).getTitle()));
                     }
                 });
                 return holder_;
@@ -62,9 +87,17 @@ public class MainActivity extends AppCompatActivity{
         rvwWindowList.setAdapter(windowRecycleViewAdapter);
         civCursorRect.SetActivity(this);
 
-
         Toast.makeText(this, "listening", Toast.LENGTH_SHORT).show();
         server = new Server(this);
+
+        WebSocketImpl.DEBUG = true;
+        try{
+            sendDataWebSocket = new SendDataWebSocket(new URI());
+            sendDataWebSocket.connect();
+        }
+        catch (URISyntaxException e){
+            e.fillInStackTrace();
+        }
     }
     @Override
     protected void onDestroy(){
@@ -78,46 +111,30 @@ public class MainActivity extends AppCompatActivity{
             case KeyEvent.KEYCODE_VOLUME_UP:
                 if (_keyevent.getAction() == KeyEvent.ACTION_DOWN) {
                     if(!isRClickDOWN) {
-                        Send(new SendData("MouseEvent", "LClickDOWN"), 2);
+                        Send(new SendData("MouseEvent", "LClickDOWN"));
                         isRClickDOWN = true;
                     }
                 }
                 else{
                     isRClickDOWN = false;
-                    Send(new SendData("MouseEvent", "LClickUP"), 2);
+                    Send(new SendData("MouseEvent", "LClickUP"));
                 }
                 break;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (_keyevent.getAction() == KeyEvent.ACTION_DOWN) {
                     if(!isLClickDOWN) {
-                        Send(new SendData("MouseEvent", "RClickDOWN"), 2);
+                        Send(new SendData("MouseEvent", "RClickDOWN"));
                         isLClickDOWN = true;
                     }
                 }
                 else{
                     isLClickDOWN = false;
-                    Send(new SendData("MouseEvent", "RClickUP"), 2);
+                    Send(new SendData("MouseEvent", "RClickUP"));
                 }
                 break;
         }
         return true;
     }
-
-    private final LoaderManager.LoaderCallbacks<String> callbacks = new LoaderManager.LoaderCallbacks<String>() {
-        @Override
-        public Loader<String>onCreateLoader(int _i, Bundle _bundle){
-            return new SelectWindowAsyncLoader(getApplicationContext(),
-                    _bundle.getString("ipAddress"), _bundle.getString("sendMessage"));
-        }
-        @Override
-        public void onLoadFinished(Loader<String> _loader, String _status){
-            getSupportLoaderManager().destroyLoader(_loader.getId());
-            System.out.println(_status);
-        }
-        @Override
-        public void onLoaderReset(Loader<String> _loader){}
-    };
-
     public void setRemoteIPAddress(String _ipAddress){
         remoteIPAddress = _ipAddress.split(":")[0].substring(1);
     }
@@ -156,13 +173,11 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     }
-    public void Send(SendData _sendData, int _loaderID){
-        String data = new Gson().toJson(_sendData);
+    public void Send(SendData _sendData){
+        String data_ = new Gson().toJson(_sendData);
 
-        Bundle bundle_ = new Bundle();
-        bundle_.putString("ipAddress", remoteIPAddress);
-        bundle_.putString("sendMessage", data);
-
-        getLoaderManager().restartLoader(_loaderID, bundle_, callbacks);
+        if(sendDataWebSocket.isOpen()){
+            sendDataWebSocket.send(data_);
+        }
     }
 }

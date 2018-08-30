@@ -9,7 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class SelectWindowAsyncLoader extends AsyncTaskLoader<String>{
+public class SelectWindowAsyncLoader extends AsyncTaskLoader<String> {
     private String result;
     private boolean isStarted = false;
     private String ipAddress;
