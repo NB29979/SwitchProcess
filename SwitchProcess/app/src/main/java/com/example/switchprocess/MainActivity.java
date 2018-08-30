@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity{
 
     private WindowRecycleViewAdapter windowRecycleViewAdapter;
 
-    private Server server;
     private String remoteIPAddress;
     private ArrayList<WindowRowData> windowList;
 
@@ -42,7 +41,14 @@ public class MainActivity extends AppCompatActivity{
         @Override
         public void onOpen(ServerHandshake _handShake){ System.out.println("Connected"); }
         @Override
-        public void onMessage(final String _message){}
+        public void onMessage(final String _message){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setLsvWindowList(new Gson().fromJson(_message, new ArrayList<String>().getClass()));
+                }
+            });
+        }
         @Override
         public void onClose(int _code, String _reason, boolean _remote){ System.out.println("Disconnected"); }
         @Override
@@ -72,7 +78,7 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View view) {
                         final int pos_ = holder_.getAdapterPosition();
-                        Send(new SendData("SelectTitle", windowList.get(pos_).getTitle()));
+                        Send(new SendingData("SelectTitle", windowList.get(pos_).getTitle()));
                     }
                 });
                 return holder_;
@@ -85,7 +91,6 @@ public class MainActivity extends AppCompatActivity{
         civCursorRect.SetActivity(this);
 
         Toast.makeText(this, "listening", Toast.LENGTH_SHORT).show();
-        server = new Server(this);
 
         try{
             sendDataWebSocket = new SendDataWebSocket(new URI());
@@ -98,34 +103,33 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onDestroy(){
         super.onDestroy();
-        server.onDestroy();
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent _keyevent) {
-        switch (_keyevent.getKeyCode()) {
+    public boolean dispatchKeyEvent(KeyEvent _keyEvent) {
+        switch (_keyEvent.getKeyCode()) {
             case KeyEvent.KEYCODE_VOLUME_UP:
-                if (_keyevent.getAction() == KeyEvent.ACTION_DOWN) {
+                if (_keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                     if(!isRClickDOWN) {
-                        Send(new SendData("MouseEvent", "LClickDOWN"));
+                        Send(new SendingData("MouseEvent", "LClickDOWN"));
                         isRClickDOWN = true;
                     }
                 }
                 else{
                     isRClickDOWN = false;
-                    Send(new SendData("MouseEvent", "LClickUP"));
+                    Send(new SendingData("MouseEvent", "LClickUP"));
                 }
                 break;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                if (_keyevent.getAction() == KeyEvent.ACTION_DOWN) {
+                if (_keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                     if(!isLClickDOWN) {
-                        Send(new SendData("MouseEvent", "RClickDOWN"));
+                        Send(new SendingData("MouseEvent", "RClickDOWN"));
                         isLClickDOWN = true;
                     }
                 }
                 else{
                     isLClickDOWN = false;
-                    Send(new SendData("MouseEvent", "RClickUP"));
+                    Send(new SendingData("MouseEvent", "RClickUP"));
                 }
                 break;
         }
@@ -169,8 +173,8 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     }
-    public void Send(SendData _sendData){
-        String data_ = new Gson().toJson(_sendData);
+    public void Send(SendingData _sendingData){
+        String data_ = new Gson().toJson(_sendingData);
         if(sendDataWebSocket.isOpen()){
             sendDataWebSocket.send(data_);
         }

@@ -37,7 +37,7 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
 
         pos variation = new pos(currentPos.x-oldPos.x, currentPos.y-oldPos.y);
 
-        mainActivity.Send(new SendData("MouseEvent","MoveCursor",
+        mainActivity.Send(new SendingData("MouseEvent","MoveCursor",
                 (double)variation.x, (double)variation.y, maxPointerCount));
 
         oldPos.setPos(currentPos.x, currentPos.y);
