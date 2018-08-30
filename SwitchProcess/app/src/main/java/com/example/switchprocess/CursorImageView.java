@@ -2,11 +2,9 @@ package com.example.switchprocess;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 
 public class CursorImageView extends android.support.v7.widget.AppCompatImageView{
-    private GestureDetector gestureDetector;
     private MainActivity mainActivity;
     private int maxPointerCount;
     private class pos{
@@ -24,7 +22,6 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
     }
     public CursorImageView(Context _context, AttributeSet _attrs, int _defStyleAttr){
         super(_context, _attrs, _defStyleAttr);
-        gestureDetector = new GestureDetector(_context, onGestureListener);
     }
 
     @Override
@@ -36,13 +33,12 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
             maxPointerCount = 0;
             oldPos.setPos(_event.getX(), _event.getY());
         }
-        gestureDetector.onTouchEvent(_event);
         maxPointerCount = Math.max(_event.getPointerCount(), maxPointerCount);
 
         pos variation = new pos(currentPos.x-oldPos.x, currentPos.y-oldPos.y);
 
         mainActivity.Send(new SendData("MouseEvent","MoveCursor",
-                (double)variation.x, (double)variation.y,0, maxPointerCount));
+                (double)variation.x, (double)variation.y, maxPointerCount));
 
         oldPos.setPos(currentPos.x, currentPos.y);
 
@@ -52,16 +48,4 @@ public class CursorImageView extends android.support.v7.widget.AppCompatImageVie
     public void SetActivity(MainActivity _mainActivity){
         mainActivity = _mainActivity;
     }
-
-    private GestureDetector.SimpleOnGestureListener onGestureListener = new GestureDetector.SimpleOnGestureListener(){
-        @Override
-        public boolean onSingleTapUp(MotionEvent _event){
-            mainActivity.Send(new SendData("MouseEvent", "SingleTap"));
-            return false;
-        }
-        @Override
-        public boolean onFling(MotionEvent _eventFrom, MotionEvent _eventTo, float _vX, float _vY) {
-            return false;
-        }
-    };
 }

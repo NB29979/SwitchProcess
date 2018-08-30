@@ -8,15 +8,12 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import android.app.LoaderManager;
-import android.content.Loader;
 
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.java_websocket.WebSocketImpl;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -90,7 +87,6 @@ public class MainActivity extends AppCompatActivity{
         Toast.makeText(this, "listening", Toast.LENGTH_SHORT).show();
         server = new Server(this);
 
-        WebSocketImpl.DEBUG = true;
         try{
             sendDataWebSocket = new SendDataWebSocket(new URI());
             sendDataWebSocket.connect();
@@ -175,7 +171,6 @@ public class MainActivity extends AppCompatActivity{
     }
     public void Send(SendData _sendData){
         String data_ = new Gson().toJson(_sendData);
-
         if(sendDataWebSocket.isOpen()){
             sendDataWebSocket.send(data_);
         }
