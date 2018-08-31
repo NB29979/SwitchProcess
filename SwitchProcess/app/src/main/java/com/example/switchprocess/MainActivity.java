@@ -7,9 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
+import java.lang.reflect.Type;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,7 +46,9 @@ public class MainActivity extends AppCompatActivity{
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    setLsvWindowList(new Gson().fromJson(_message, new ArrayList<String>().getClass()));
+                    Type listType_ = new TypeToken<ArrayList<WindowRowData>>(){}.getType();
+                    ArrayList<WindowRowData> windowRowDataList_ = new Gson().fromJson(_message, listType_);
+                    setLsvWindowList(windowRowDataList_);
                 }
             });
         }
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity{
         isLClickDOWN = false;
 
         // ウインドウタイトルを選択した場合
-        windowRecycleViewAdapter = new WindowRecycleViewAdapter(windowList){
+        windowRecycleViewAdapter = new WindowRecycleViewAdapter(this, windowList){
             @Override
             public WindowViewHolder onCreateViewHolder(ViewGroup _parent, int _viewType) {
                 final WindowViewHolder holder_ = super.onCreateViewHolder(_parent, _viewType);
@@ -136,34 +139,35 @@ public class MainActivity extends AppCompatActivity{
     public void setRemoteIPAddress(String _ipAddress){
         remoteIPAddress = _ipAddress.split(":")[0].substring(1);
     }
-    public void setLsvWindowList(ArrayList<String> _newWindowList){
-        ArrayList<String> titles = new ArrayList<>();
-        for(WindowRowData w : windowList) titles.add(w.getTitle());
+    public void setLsvWindowList(ArrayList<WindowRowData> _newWindowList){
+        ArrayList<WindowRowData> windowList_ = new ArrayList<>();
+        windowList_.addAll(windowList);
 
         // 閉じられたウインドウをリストから削除
-        for (String w : titles) {
+        for (WindowRowData w : windowList_) {
             if (!_newWindowList.contains(w)) {
                 removeWindow(w);
             }
         }
+
         // 過去のウインドウリストにない新規ウインドウを追加
-        for(String w : _newWindowList){
-            if(!titles.contains(w)){
+        for(WindowRowData w : _newWindowList){
+            if(!windowList_.contains(w)){
                 addWindow(w);
             }
         }
     }
-    public void addWindow(String _windowTitle){
-        windowList.add(new WindowRowData(_windowTitle));
+    public void addWindow(WindowRowData _windowData){
+        windowList.add(_windowData);
         windowRecycleViewAdapter.notifyItemChanged(windowList.size()-1);
     }
-    public void removeWindow(String _windowTitle){
-        int index_ = windowList.indexOf(new WindowRowData(_windowTitle));
+    public void removeWindow(WindowRowData _windowData){
+        int index_ = windowList.indexOf(_windowData);
         Iterator<WindowRowData> it = windowList.iterator();
 
         while(it.hasNext()){
             WindowRowData rowData_ = it.next();
-            if(rowData_.getTitle().equals(_windowTitle)){
+            if(rowData_.getWindowData().equals(_windowData)){
                 it.remove();
                 windowRecycleViewAdapter.notifyItemRemoved(index_);
                 windowRecycleViewAdapter.notifyItemRangeChanged(index_, windowList.size());
